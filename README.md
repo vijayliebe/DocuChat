@@ -78,20 +78,21 @@ npm run dev
 
 ## LLM Configuration
 
-DocuChat supports two LLM providers: **LM Studio** and **Ollama**. You can switch between them using environment variables.
+DocuChat supports four LLM providers: **LM Studio**, **Ollama**, **OpenAI**, and **Gemini**. You can switch between them using the `LLM_PROVIDER` environment variable in your `.env` file.
 
-### Using LM Studio (Default)
+### Using LM Studio
 
 1. **Install and start LM Studio**:
    - Download from [lmstudio.ai](https://lmstudio.ai)
    - Start LM Studio and load a model
    - Ensure the local server is running on port 1234
 
-2. **Configure in docker-compose.yml**:
-   ```yaml
-   environment:
-     - LLM_PROVIDER=lm_studio
-     - LM_STUDIO_API_BASE=http://host.docker.internal:1234/v1
+2. **Configure in `.env` file**:
+   ```bash
+   LLM_PROVIDER=lm_studio
+   ```
+   
+   Note: LM Studio configuration (API base, model) is set in `docker-compose.yml` and doesn't require API keys.
      - LM_STUDIO_MODEL=gpt-3.5-turbo
    ```
 
@@ -118,13 +119,12 @@ DocuChat supports two LLM providers: **LM Studio** and **Ollama**. You can switc
    ollama pull llama2:13b      # Larger Llama 2 model
    ```
 
-3. **Configure in docker-compose.yml**:
-   ```yaml
-   environment:
-     - LLM_PROVIDER=ollama
-     - OLLAMA_BASE_URL=http://host.docker.internal:11434
-     - OLLAMA_MODEL=llama2
+3. **Configure in `.env` file**:
+   ```bash
+   LLM_PROVIDER=ollama
    ```
+   
+   Note: Ollama configuration (base URL, model) is set in `docker-compose.yml` and can be overridden in `.env` if needed.
 
 4. **Start the application**:
    ```bash
@@ -138,12 +138,11 @@ DocuChat supports two LLM providers: **LM Studio** and **Ollama**. You can switc
    - Navigate to [API Keys](https://platform.openai.com/api-keys)
    - Create a new secret key
 
-2. **Configure in docker-compose.yml**:
-   ```yaml
-   environment:
-     - LLM_PROVIDER=openai
-     - OPENAI_API_KEY=your-api-key-here
-     - OPENAI_MODEL=gpt-3.5-turbo
+2. **Configure in `.env` file**:
+   ```bash
+   LLM_PROVIDER=openai
+   OPENAI_API_KEY=your-api-key-here
+   OPENAI_MODEL=gpt-3.5-turbo
    ```
    
    **Available models:**
@@ -163,36 +162,50 @@ DocuChat supports two LLM providers: **LM Studio** and **Ollama**. You can switc
    - Sign in with your Google account
    - Create a new API key
 
-2. **Configure in docker-compose.yml**:
-   ```yaml
-   environment:
-     - LLM_PROVIDER=gemini
-     - GEMINI_API_KEY=your-api-key-here
-     - GEMINI_MODEL=gemini-1.5-pro
+2. **Configure in `.env` file**:
+   ```bash
+   LLM_PROVIDER=gemini
+   GEMINI_API_KEY=your-api-key-here
+   GEMINI_MODEL=models/gemini-2.5-flash
    ```
    
    **Available models:**
-   - `gemini-1.5-pro` - Latest general purpose model (recommended, default)
-   - `gemini-1.5-flash` - Faster, optimized for speed
-   - `gemini-pro` - Legacy model (may not be available in all regions)
+   - `models/gemini-2.5-flash` - Latest fast model (recommended, default)
+   - `models/gemini-2.5-pro` - Latest high-quality model
+   - `models/gemini-2.0-flash` - Previous generation fast model
+   - `models/gemini-1.5-flash` - Older fast model
+   - `models/gemini-1.5-pro` - Older high-quality model
 
 3. **Start the application**:
    ```bash
    docker-compose up -d
    ```
 
-### Switching Between Providers
+### Switching Between LLM Providers
 
-To switch between providers (LM Studio, Ollama, OpenAI, or Gemini):
+To switch between providers, edit your `.env` file and change the `LLM_PROVIDER` value:
 
-1. **Edit `docker-compose.yml`**:
-   - Change `LLM_PROVIDER` to `lm_studio` or `ollama`
-   - Update the corresponding configuration variables
+1. **Edit the `.env` file**:
+   ```bash
+   # Change LLM_PROVIDER to one of: lm_studio, ollama, openai, or gemini
+   LLM_PROVIDER=openai  # or gemini, ollama, lm_studio
+   ```
 
-2. **Restart the backend**:
+2. **Ensure required API keys are set** (if using OpenAI or Gemini):
+   - For OpenAI: Set `OPENAI_API_KEY` in `.env`
+   - For Gemini: Set `GEMINI_API_KEY` in `.env`
+
+3. **Restart the backend**:
    ```bash
    docker-compose restart backend
    ```
+
+**Example**: To switch from OpenAI to Gemini:
+```bash
+# In .env file, change:
+LLM_PROVIDER=gemini
+# Make sure GEMINI_API_KEY is set
+```
 
 ### Recommended Models
 
@@ -225,10 +238,18 @@ To switch between providers (LM Studio, Ollama, OpenAI, or Gemini):
 
 ## Environment Variables
 
+Environment variables are configured in the `.env` file. Copy `.env.example` to `.env` and update with your values:
+
+```bash
+cp .env.example .env
+```
+
 ### Backend
 
 **LLM Provider Selection:**
 - `LLM_PROVIDER` - Choose LLM provider: `lm_studio`, `ollama`, `openai`, or `gemini` (default: `lm_studio`)
+  
+  **Set this in `.env` file to switch providers.**
 
 **LM Studio Configuration** (when `LLM_PROVIDER=lm_studio`):
 - `LM_STUDIO_API_BASE` - LM Studio API base URL (default: `http://host.docker.internal:1234/v1`)
@@ -247,7 +268,11 @@ To switch between providers (LM Studio, Ollama, OpenAI, or Gemini):
 - `GEMINI_API_KEY` - Your Google Gemini API key (required). Get it from [makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
 - `GEMINI_MODEL` - Gemini model to use (default: `models/gemini-2.5-flash`). Options: `models/gemini-2.5-flash`, `models/gemini-2.5-pro`, `models/gemini-2.0-flash`, `models/gemini-1.5-flash`, `models/gemini-1.5-pro`
 
-**Note**: API keys for OpenAI and Gemini are loaded from the `.env` file. Copy `.env.example` to `.env` and add your API keys. The `.env` file is gitignored and will not be committed to version control.
+**Important Notes:**
+- All environment variables (including `LLM_PROVIDER`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, etc.) should be set in the `.env` file
+- The `.env` file is gitignored and will not be committed to version control
+- Copy `.env.example` to `.env` and update with your actual API keys
+- After changing `LLM_PROVIDER` in `.env`, restart the backend: `docker-compose restart backend`
 
 **ChromaDB Configuration:**
 - `CHROMA_SERVER_HOST` - ChromaDB server host (default: embedded mode)
