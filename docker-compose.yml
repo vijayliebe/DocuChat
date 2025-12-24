@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: docuchat-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data
+    env_file:
+      - .env
+    environment:
+      # LLM Provider: "lm_studio", "ollama", "openai", or "gemini" (default: lm_studio)
+      # LLM_PROVIDER, OPENAI_API_KEY, OPENAI_MODEL, GEMINI_API_KEY, GEMINI_MODEL are loaded from .env file
+      # LM Studio Configuration (used when LLM_PROVIDER=lm_studio)
+      - LM_STUDIO_API_BASE=http://host.docker.internal:1234/v1
+      - LM_STUDIO_MODEL=gpt-3.5-turbo
+      # Ollama Configuration (used when LLM_PROVIDER=ollama)
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=llama2
+      # ChromaDB Configuration
+      - CHROMA_SERVER_HOST=chromadb
+      - CHROMA_SERVER_HTTP_PORT=8000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - chromadb
+    restart: always
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: docuchat-chroma
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./backend/data/chroma:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: docuchat-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    restart: always
