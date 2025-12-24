@@ -422,9 +422,47 @@ If the backend can't connect to Gemini:
 
 ## License
 
-[Add your license here]
+This project is open source and available under the [MIT License](LICENSE).
 
 ## Contributing
 
-[Add contribution guidelines here]
+Contributions are welcome! Please feel free to submit a Pull Request. Here are some guidelines:
+
+1. **Fork the repository** and create your branch from `main`
+2. **Make your changes** and ensure they work correctly
+3. **Test your changes**:
+   - Test with different LLM providers if applicable
+   - Ensure the Docker setup still works
+   - Test file uploads and chat functionality
+4. **Update documentation** if you add new features or change existing behavior
+5. **Submit a Pull Request** with a clear description of your changes
+
+### Development Setup
+
+1. Clone the repository:
+   ```bash
+   git clone git@github.com-personal:vijayliebe/DocuChat.git
+   cd DocuChat
+   ```
+
+2. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your API keys
+   ```
+
+3. Start the development environment:
+   ```bash
+   docker-compose up -d
+   ```
+
+4. Make your changes and test them
+
+### Reporting Issues
+
+If you find a bug or have a feature request, please open an issue on GitHub with:
+- A clear description of the problem or feature
+- Steps to reproduce (for bugs)
+- Expected vs actual behavior
+- Your environment (OS, Docker version, LLM provider used)
 
