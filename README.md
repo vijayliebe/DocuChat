@@ -2,6 +2,22 @@
 
 A Retrieval-Augmented Generation (RAG) application that allows you to upload documents and query them using natural language. Built with FastAPI, React, LlamaIndex, and ChromaDB.
 
+## Preview
+
+![DocuChat UI — upload documents and chat with RAG context](docs/preview-docuchat.png)
+
+*Empty-state DocuChat: upload PDF, DOCX, or TXT files in the sidebar, then ask questions in the chat. Screenshot from the Vite frontend at http://localhost:5173. Full answers need an LLM provider (`LLM_PROVIDER` plus an API key, or LM Studio / Ollama).*
+
+```bash
+# Frontend only (UI)
+cd frontend && npm install && npm run dev
+
+# Full stack (Docker)
+cp .env.example .env   # set LLM_PROVIDER + keys as needed
+docker-compose up -d
+# Frontend http://localhost:5173 · API docs http://localhost:8000/docs
+```
+
 ## Overview
 
 DocuChat enables you to:
